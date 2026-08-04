@@ -48,7 +48,7 @@ namespace StaffCoreRD.Controllers
                     }
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Staff");
                 }
 
                 foreach (var error in result.Errors)
