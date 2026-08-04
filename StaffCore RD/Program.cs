@@ -50,6 +50,24 @@ app.UseRouting();
 app.UseAuthentication();      // ← PRIMERO
 app.UseAuthorization();       // ← DESPUÉS
 
+// ========== CREAR ROLES AUTOMÁTICAMENTE ==========
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    string[] rolesNeeded = { "Administrador", "RRHH", "Viewer" };
+
+    foreach (var role in rolesNeeded)
+    {
+        var roleExists = await roleManager.RoleExistsAsync(role);
+        if (!roleExists)
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+}
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
