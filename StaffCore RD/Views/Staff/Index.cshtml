@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Staff>
+@using StaffCoreRD.Models
+@{
+    ViewData["Title"] = "Gestión de Personal";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>📋 Personal Activo</h1>
+    </div>
+    <div class="col-md-4 text-end">
+        @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+        {
+            <a asp-action="Create" class="btn btn-success">
+                ➕ Nuevo Empleado
+            </a>
+        }
+    </div>
+</div>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cédula</th>
+                    <th>Cargo</th>
+                    <th>Departamento</th>
+                    <th>Salario (RD$)</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong>@item.Nombre</strong></td>
+                        <td>@item.Cedula</td>
+                        <td>@item.Cargo</td>
+                        <td><span class="badge bg-info">@item.Departamento</span></td>
+                        <td class="text-end">@item.Salario.ToString("N2")</td>
+                        <td>@item.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning btn-action">
+                                    ✏️ Editar
+                                </a>
+                            }
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger btn-action">
+                                    🗑️ Eliminar
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-light fw-bold">
+                <tr>
+                    <td colspan="4">Total de Nómina:</td>
+                    <td class="text-end">@Model.Sum(s => s.Salario).ToString("N2")</td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">ℹ️ Sin Personal</h4>
+        <p>
+            No hay empleados activos en el sistema.
+            @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+            {
+                <a asp-action="Create">Agregar el primer empleado</a>
+            }
+        </p>
+    </div>
+}

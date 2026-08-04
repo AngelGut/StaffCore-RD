@@ -1,0 +1,37 @@
+﻿@model Staff
+@using StaffCoreRD.Models
+@{
+    ViewData["Title"] = "Eliminar Empleado";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">⚠️ Confirmar Eliminación</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Estás a punto de eliminar al siguiente empleado. Esta acción es permanente.
+                </p>
+
+                <div class="alert alert-warning">
+                    <h5>@Model.Nombre</h5>
+                    <p class="mb-0"><strong>Departamento:</strong> @Model.Departamento</p>
+                    <p class="mb-0"><strong>Cargo:</strong> @Model.Cargo</p>
+                    <p class="mb-0"><strong>Salario:</strong> RD$@Model.Salario.ToString("N2")</p>
+                </div>
+
+                <form asp-action="Delete" method="post" class="mt-4">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger">
+                        🗑️ Sí, Eliminar Permanentemente
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        ❌ Cancelar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
