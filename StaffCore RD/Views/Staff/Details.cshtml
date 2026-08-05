@@ -1,0 +1,93 @@
+﻿@model Staff
+@using StaffCoreRD.Models
+@{
+    ViewData["Title"] = "Detalles del Empleado";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>👤 Detalles del Empleado</h1>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-action="Index" class="btn btn-secondary">
+            ← Volver al Personal
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">@Model.Nombre</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Cédula:</strong>
+                        <p class="text-muted">@Model.Cedula</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Cargo:</strong>
+                        <p class="text-muted">@Model.Cargo</p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Departamento:</strong>
+                        <p>
+                            <span class="badge bg-info" style="font-size: 1em;">
+                                @Model.Departamento
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Salario (RD$):</strong>
+                        <p class="text-muted">@Model.Salario.ToString("N2")</p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Fecha de Ingreso:</strong>
+                        <p class="text-muted">@Model.FechaIngreso.ToString("dd/MM/yyyy")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Estado:</strong>
+                        <p>
+                            @if (Model.Activo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactivo</span>
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="mt-4">
+                    @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                            ✏️ Editar
+                        </a>
+                    }
+                    @if (User.IsInRole("Administrador"))
+                    {
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger me-2">
+                            🗑️ Eliminar
+                        </a>
+                    }
+                    <a asp-action="Index" class="btn btn-secondary">
+                        ← Volver
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

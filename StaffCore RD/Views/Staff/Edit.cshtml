@@ -1,75 +1,92 @@
-﻿@model Staff
+﻿@model IEnumerable<Staff>
 @using StaffCoreRD.Models
 @{
-    ViewData["Title"] = "Editar Empleado";
+    ViewData["Title"] = "Gestión de Personal";
 }
 
-<div class="row">
-    <div class="col-md-8">
-        <h1>✏️ Editar Empleado</h1>
-
-        <form asp-action="Edit" method="post" class="mt-4" novalidate>
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-            <!-- Hidden ID - OBLIGATORIO -->
-            <input asp-for="Id" type="hidden" />
-
-            <div class="mb-3">
-                <label asp-for="Nombre" class="form-label">Nombre Completo *</label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Cedula" class="form-label">Cédula *</label>
-                <input asp-for="Cedula" class="form-control" />
-                <span asp-validation-for="Cedula" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Cargo" class="form-label">Cargo *</label>
-                <input asp-for="Cargo" class="form-control" />
-                <span asp-validation-for="Cargo" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Departamento" class="form-label">Departamento *</label>
-                <select asp-for="Departamento" class="form-select">
-                    <option value="Tecnología">Tecnología</option>
-                    <option value="Recursos Humanos">Recursos Humanos</option>
-                    <option value="Finanzas">Finanzas</option>
-                    <option value="Operaciones">Operaciones</option>
-                </select>
-                <span asp-validation-for="Departamento" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Salario" class="form-label">Salario (RD$) *</label>
-                <input asp-for="Salario" type="number" step="0.01" class="form-control" />
-                <span asp-validation-for="Salario" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="FechaIngreso" class="form-label">Fecha de Ingreso</label>
-                <input asp-for="FechaIngreso" type="date" class="form-control" />
-                <span asp-validation-for="FechaIngreso" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3 form-check">
-                <input asp-for="Activo" type="checkbox" class="form-check-input" />
-                <label asp-for="Activo" class="form-check-label">Empleado Activo</label>
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">💾 Actualizar</button>
-                <a asp-action="Index" class="btn btn-secondary">❌ Cancelar</a>
-            </div>
-        </form>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h1>📋 Personal Activo</h1>
+    </div>
+    <div class="col-md-6 text-end">
+        @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+        {
+            <a asp-action="Create" class="btn btn-success me-2">
+                ➕ Nuevo Empleado
+            </a>
+            <a asp-action="Summary" class="btn btn-info">
+                📊 Resumen Estadístico
+            </a>
+        }
     </div>
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cédula</th>
+                    <th>Cargo</th>
+                    <th>Departamento</th>
+                    <th>Salario (RD$)</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" style="text-decoration: none; color: inherit;">
+                                <strong>@item.Nombre</strong>
+                            </a>
+                        </td>
+                        <td>@item.Cedula</td>
+                        <td>@item.Cargo</td>
+                        <td><span class="badge bg-info">@item.Departamento</span></td>
+                        <td class="text-end">@item.Salario.ToString("N2")</td>
+                        <td>@item.FechaIngreso.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning btn-action">
+                                    ✏️ Editar
+                                </a>
+                            }
+                            @if (User.IsInRole("Administrador"))
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger btn-action">
+                                    🗑️ Eliminar
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot class="table-light fw-bold">
+                <tr>
+                    <td colspan="4">Total de Nómina:</td>
+                    <td class="text-end">@Model.Sum(s => s.Salario).ToString("N2")</td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">ℹ️ Sin Personal</h4>
+        <p>
+            No hay empleados activos en el sistema.
+            @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+            {
+                <a asp-action="Create">Agregar el primer empleado</a>
+            }
+        </p>
+    </div>
 }

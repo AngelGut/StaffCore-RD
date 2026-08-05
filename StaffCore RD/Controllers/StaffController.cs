@@ -148,5 +148,50 @@ namespace StaffCoreRD.Controllers
         {
             return _context.Personal.Any(e => e.Id == id);
         }
+
+        // ========== RESUMEN ESTADÍSTICO POR DEPARTAMENTO ==========
+        [Authorize(Roles = "Administrador,RRHH")]
+        [HttpGet]
+        public async Task<IActionResult> Summary()
+        {
+            var resumenPorDepto = await _context.Personal
+                .Where(s => s.Activo)
+                .GroupBy(s => s.Departamento)
+                .Select(g => new
+                {
+                    Departamento = g.Key,
+                    TotalEmpleados = g.Count(),
+                    TotalNomina = g.Sum(s => s.Salario),
+                    SalarioPromedio = g.Average(s => s.Salario)
+                })
+                .OrderBy(x => x.Departamento)
+                .ToListAsync();
+
+            // Calcular totales generales
+            ViewData["TotalEmpleados"] = resumenPorDepto.Sum(x => x.TotalEmpleados);
+            ViewData["TotalNomina"] = resumenPorDepto.Sum(x => x.TotalNomina);
+            ViewData["SalarioPromedio"] = resumenPorDepto.Average(x => x.SalarioPromedio);
+
+            return View(resumenPorDepto);
+        }
+
+        // ========== DETAILS ==========
+        [Authorize(Roles = "Administrador,RRHH,Viewer")]
+        [HttpGet]
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var staff = await _context.Personal.FindAsync(id);
+            if (staff == null)
+            {
+                return NotFound();
+            }
+
+            return View(staff);
+        }
     }
 }

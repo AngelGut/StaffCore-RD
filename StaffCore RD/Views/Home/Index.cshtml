@@ -1,8 +1,86 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Bienvenido a StaffCore RD";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row mt-5">
+    <div class="col-md-8 mx-auto text-center">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <h1 class="display-4 mb-4">📊 StaffCore RD</h1>
+                <p class="lead text-muted mb-4">
+                    Sistema de Gestión de Personal para Empresas Dominicanas
+                </p>
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <!-- USUARIOS AUTENTICADOS -->
+                    <p class="mb-5">
+                        Bienvenido, <strong>@User.Identity.Name</strong>. Accede a las funcionalidades del sistema.
+                    </p>
+
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a asp-action="Index" asp-controller="Staff" class="btn btn-primary btn-lg">
+                            👥 Ver Personal
+                        </a>
+                        <a asp-action="Summary" asp-controller="Staff" class="btn btn-info btn-lg">
+                            📊 Resumen Estadístico
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <!-- USUARIOS SIN AUTENTICAR -->
+                    <p class="mb-5">
+                        Administra tu personal de forma eficiente con nuestro sistema seguro y fácil de usar.
+                    </p>
+
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                        <a asp-action="Login" asp-controller="Account" class="btn btn-primary btn-lg">
+                            🔐 Iniciar Sesión
+                        </a>
+                        <a asp-action="Register" asp-controller="Account" class="btn btn-success btn-lg">
+                            ✍️ Crear Cuenta
+                        </a>
+                    </div>
+
+                    <hr class="my-5" />
+
+                    <div class="row mt-5">
+                        <div class="col-md-4">
+                            <div class="feature-box">
+                                <h5>🔒 Seguridad</h5>
+                                <p class="small text-muted">Autenticación segura con roles y permisos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box">
+                                <h5>📋 CRUD Completo</h5>
+                                <p class="small text-muted">Crear, leer, editar y eliminar personal</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box">
+                                <h5>📊 Reportes</h5>
+                                <p class="small text-muted">Visualiza nómina y departamentos</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+    .feature-box {
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+        .feature-box:hover {
+            background-color: #e9ecef;
+            transform: translateY(-5px);
+        }
+</style>

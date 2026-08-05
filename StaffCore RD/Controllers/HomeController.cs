@@ -15,6 +15,12 @@ namespace StaffCore_RD.Controllers
 
         public IActionResult Index()
         {
+            // Si el usuario está autenticado, redirigir a Staff/Index
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Staff");
+            }
+
             return View();
         }
 
