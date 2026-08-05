@@ -1,0 +1,64 @@
+﻿@model IEnumerable<UserRoleViewModel>
+@using StaffCoreRD.Models
+@{
+    ViewData["Title"] = "Gestionar Roles";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1>👥 Gestionar Roles de Usuarios</h1>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-action="RegisterUser" class="btn btn-success">
+            ➕ Crear Usuario RRHH
+        </a>
+    </div>
+</div>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Email</th>
+                <th>Rol Actual</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>
+                        <span class="badge bg-info">@user.CurrentRole</span>
+                    </td>
+                    <td>
+                        <form asp-action="ChangeRole" method="post" class="d-inline">
+                            <input type="hidden" name="userId" value="@user.UserId" />
+                            <select name="newRole" class="form-select form-select-sm d-inline w-auto">
+                                @foreach (var role in user.AllRoles)
+                                {
+                                    <option value="@role"
+                                            selected="@(user.CurrentRole == role)">
+                                        @role
+                                    </option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-warning">
+                                Actualizar
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

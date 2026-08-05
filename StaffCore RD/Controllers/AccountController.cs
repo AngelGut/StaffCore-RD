@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StaffCore_RD.Controllers;
 using StaffCoreRD.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StaffCoreRD.Controllers
 {
@@ -127,6 +128,79 @@ namespace StaffCoreRD.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
+        }
+        // ========== GESTIÓN DE ROLES (ADMIN ONLY) ==========
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public async Task<IActionResult> ManageRoles()
+        {
+            var users = _userManager.Users.ToList();
+            var userRoles = new List<UserRoleViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoles.Add(new UserRoleViewModel
+                {
+                    UserId = user.Id,
+                    Email = user.Email,
+                    CurrentRole = roles.FirstOrDefault() ?? "Sin rol",
+                    AllRoles = new[] { "Administrador", "RRHH", "Viewer" }
+                });
+            }
+
+            return View(userRoles);
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeRole(string userId, string newRole)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            await _userManager.AddToRoleAsync(user, newRole);
+
+            TempData["Exito"] = $"Usuario {user.Email} ascendido a {newRole}";
+            return RedirectToAction(nameof(ManageRoles));
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public IActionResult RegisterUser()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RegisterUser(RegisterUserAdminViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, model.Role);
+                    TempData["Exito"] = $"Usuario {model.Email} creado como {model.Role}";
+                    return RedirectToAction(nameof(ManageRoles));
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            return View(model);
         }
     }
 }

@@ -14,8 +14,14 @@
             <a asp-action="Create" class="btn btn-success me-2">
                 ➕ Nuevo Empleado
             </a>
-            <a asp-action="Summary" class="btn btn-info">
+            <a asp-action="Summary" class="btn btn-info me-2">
                 📊 Resumen Estadístico
+            </a>
+        }
+        @if (User.IsInRole("Administrador"))
+        {
+            <a asp-controller="Account" asp-action="ManageRoles" class="btn btn-warning">
+                👥 Gestionar Roles
             </a>
         }
     </div>
