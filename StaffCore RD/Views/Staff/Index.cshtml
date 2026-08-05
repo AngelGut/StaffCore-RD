@@ -40,7 +40,11 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td><strong>@item.Nombre</strong></td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" style="text-decoration: none; color: inherit;">
+                                <strong>@item.Nombre</strong>
+                            </a>
+                        </td>
                         <td>@item.Cedula</td>
                         <td>@item.Cargo</td>
                         <td><span class="badge bg-info">@item.Departamento</span></td>
